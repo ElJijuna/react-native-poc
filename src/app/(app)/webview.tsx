@@ -1,10 +1,11 @@
 import { router } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView, type WebViewNavigation } from 'react-native-webview';
 
-import { createInjectedBridge, parseWebViewMessage } from '@/webview/bridge';
+import { handleBridgeMessage } from '@/webview/bridge/native-bridge';
+import { createInjectedBridge } from '@/webview/bridge/transport';
 import { demoHtml } from '@/webview/demo-html';
 
 const configuredUrl = process.env.EXPO_PUBLIC_WEBVIEW_URL?.trim();
@@ -49,10 +50,7 @@ export default function WebViewScreen() {
         ref={webViewRef}
         injectedJavaScriptBeforeContentLoaded={createInjectedBridge(platform)}
         onMessage={(event) => {
-          const request = parseWebViewMessage(event.nativeEvent.data);
-          if (request) {
-            Alert.alert(request.title, request.message);
-          }
+          void handleBridgeMessage(webViewRef.current, event.nativeEvent.data);
         }}
         onNavigationStateChange={handleNavigationChange}
         originWhitelist={['https://*', 'http://*', 'about:*']}

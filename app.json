@@ -34,7 +34,14 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Permite a $(PRODUCT_NAME) acceder a tus contactos para compartirlos con la experiencia web."
+        }
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,

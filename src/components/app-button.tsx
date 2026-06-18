@@ -16,12 +16,12 @@ export function AppButton({
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
-      style={({ pressed }) => [
+      style={(state) => [
         styles.button,
         styles[variant],
-        pressed && styles.pressed,
+        state.pressed && styles.pressed,
         disabled && styles.disabled,
-        typeof style === 'function' ? style({ pressed }) : style,
+        typeof style === 'function' ? style(state) : style,
       ]}
       {...props}>
       <Text style={[styles.label, variant !== 'primary' && styles.secondaryLabel]}>{label}</Text>

@@ -6,7 +6,8 @@ Expo Router POC para iOS y Android:
 - Dashboard con tres tabs
 - Sesión en memoria
 - WebView configurable
-- Bridge Web → React Native para abrir `Alert.alert`
+- Bridge Web ↔ React Native versionado
+- Alert nativo, lectura de contactos y compartir archivos
 
 ## Ejecutar
 
@@ -27,30 +28,9 @@ Luego define `EXPO_PUBLIC_WEBVIEW_URL`.
 
 ## Contrato WebView
 
-React Native inyecta antes de cargar página:
+Arquitectura, eventos, payloads, respuestas y ejemplos:
 
-```js
-window.ReactNativePOC = {
-  isWebView: true,
-  platform: 'ios' // o 'android'
-};
-```
-
-Web solicita alert nativo:
-
-```js
-window.ReactNativeWebView.postMessage(
-  JSON.stringify({
-    type: 'OPEN_NATIVE_ALERT',
-    payload: {
-      title: 'Mensaje web',
-      message: 'Hola desde WebView'
-    }
-  })
-);
-```
-
-Mensajes inválidos o tipos desconocidos son ignorados.
+- [docs/WEBVIEW_BRIDGE.md](docs/WEBVIEW_BRIDGE.md)
 
 ## Verificación
 
