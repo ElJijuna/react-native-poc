@@ -11,6 +11,18 @@ export default function AppLayout() {
           presentation: 'modal',
         }}
       />
+      <Stack.Screen
+        name="native-webview"
+        options={{
+          headerShown: true,
+          title: 'Portal',
+          headerBackTitle: 'Inicio',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerTintColor: '#2563EB',
+          headerTitleStyle: { color: '#0F172A', fontWeight: '700' },
+        }}
+      />
     </Stack>
   );
 }

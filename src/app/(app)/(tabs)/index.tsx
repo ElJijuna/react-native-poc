@@ -15,6 +15,11 @@ export default function DashboardScreen() {
           Abre página demo, detecta entorno nativo y solicita alert mediante postMessage.
         </Text>
         <AppButton label="Abrir WebView" onPress={() => router.push('/webview')} />
+        <AppButton
+          label="Abrir WebView con UI nativa"
+          onPress={() => router.push('/native-webview')}
+          variant="secondary"
+        />
       </View>
     </Screen>
   );
