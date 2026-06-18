@@ -118,6 +118,7 @@ type BridgeContact = {
 
 Solo estos campos salen del dispositivo. Si usuario deniega permiso, Promise rechaza con
 `PERMISSION_DENIED`.
+Android solicita únicamente `READ_CONTACTS`; `WRITE_CONTACTS` está bloqueado en `app.json`.
 
 ### `SHARE_FILE`
 
