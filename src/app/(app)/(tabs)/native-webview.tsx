@@ -7,7 +7,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 
 import { handleBridgeMessage } from '@/webview/bridge/native-bridge';
@@ -30,7 +29,7 @@ export default function NativeWebViewScreen() {
   }
 
   return (
-    <SafeAreaView edges={['bottom']} style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <View style={styles.container}>
         {isLoading && !error ? (
           <View style={styles.progressTrack}>
@@ -90,7 +89,7 @@ export default function NativeWebViewScreen() {
         ) : null}
       </View>
 
-    </SafeAreaView>
+    </View>
   );
 }
 

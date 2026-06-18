@@ -1,5 +1,6 @@
-import { Tabs } from 'expo-router';
-import { StyleSheet, Text, type ColorValue } from 'react-native';
+import { SymbolView } from 'expo-symbols';
+import { router, Tabs } from 'expo-router';
+import { Pressable, StyleSheet, Text, type ColorValue } from 'react-native';
 
 const icons = {
   index: '⌂',
@@ -42,6 +43,33 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => <TabIcon color={color} name="settings" />,
         }}
       />
+      <Tabs.Screen
+        name="native-webview"
+        options={{
+          href: null,
+          headerShown: true,
+          title: 'Portal',
+          headerShadowVisible: false,
+          headerStyle: { backgroundColor: '#FFFFFF' },
+          headerTintColor: '#2563EB',
+          headerTitleStyle: { color: '#0F172A', fontWeight: '700' },
+          headerLeft: () => (
+            <Pressable
+              accessibilityLabel="Volver al dashboard"
+              accessibilityRole="button"
+              hitSlop={8}
+              onPress={() => router.back()}
+              style={styles.headerBack}>
+              <SymbolView
+                name={{ ios: 'chevron.left', android: 'arrow_back' }}
+                size={20}
+                tintColor="#2563EB"
+              />
+              <Text style={styles.headerBackText}>Inicio</Text>
+            </Pressable>
+          ),
+        }}
+      />
     </Tabs>
   );
 }
@@ -60,5 +88,19 @@ const styles = StyleSheet.create({
   icon: {
     fontSize: 22,
     lineHeight: 24,
+  },
+  headerBack: {
+    minHeight: 44,
+    minWidth: 72,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    justifyContent: 'center',
+    paddingRight: 8,
+  },
+  headerBackText: {
+    color: '#2563EB',
+    fontSize: 17,
+    fontWeight: '500',
   },
 });
