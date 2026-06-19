@@ -41,7 +41,7 @@ export default function NativeWebViewScreen() {
       <WebView
         ref={webViewRef}
         contentInset={Platform.OS === 'ios' ? { bottom: TAB_PILL_CLEARANCE } : undefined}
-        contentInsetAdjustmentBehavior="automatic"
+        contentInsetAdjustmentBehavior="never"
         injectedJavaScriptBeforeContentLoaded={createInjectedBridge(bridgePlatform)}
         onError={(event) => {
           setError(event.nativeEvent.description || 'No se pudo cargar contenido.');

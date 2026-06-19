@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useCallback, useRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView, type WebViewNavigation } from 'react-native-webview';
 
@@ -9,7 +10,7 @@ import { createInjectedBridge } from '@/webview/bridge/transport';
 import { demoHtml } from '@/webview/demo-html';
 
 const configuredUrl = process.env.EXPO_PUBLIC_WEBVIEW_URL?.trim();
-const platform = Platform.OS === 'ios' ? 'ios' : 'android';
+const bridgePlatform = Platform.OS === 'ios' ? 'ios' : 'android';
 
 export default function WebViewScreen() {
   const webViewRef = useRef<WebView>(null);
@@ -20,9 +21,7 @@ export default function WebViewScreen() {
   }, []);
 
   function handleWebViewBack() {
-    if (canGoBack) {
-      webViewRef.current?.goBack();
-    }
+    if (canGoBack) webViewRef.current?.goBack();
   }
 
   return (
@@ -31,24 +30,33 @@ export default function WebViewScreen() {
         <Pressable
           accessibilityRole="button"
           disabled={!canGoBack}
+          hitSlop={8}
           onPress={handleWebViewBack}
           style={[styles.toolbarButton, !canGoBack && styles.disabled]}>
-          <Text style={styles.toolbarButtonText}>Atrás</Text>
+          <SymbolView
+            name={{ ios: 'chevron.left', android: 'arrow_back' }}
+            size={22}
+            tintColor="#007AFF"
+          />
         </Pressable>
-        <Text numberOfLines={1} style={styles.title}>
-          WebView
-        </Text>
+        <View style={styles.spacer} />
         <Pressable
+          accessibilityLabel="Cerrar"
           accessibilityRole="button"
+          hitSlop={8}
           onPress={() => router.back()}
           style={styles.toolbarButton}>
-          <Text style={styles.toolbarButtonText}>Cerrar</Text>
+          <SymbolView
+            name={{ ios: 'xmark', android: 'close' }}
+            size={16}
+            tintColor="#8E8E93"
+          />
         </Pressable>
       </View>
 
       <WebView
         ref={webViewRef}
-        injectedJavaScriptBeforeContentLoaded={createInjectedBridge(platform)}
+        injectedJavaScriptBeforeContentLoaded={createInjectedBridge(bridgePlatform)}
         onMessage={(event) => {
           void handleBridgeMessage(webViewRef.current, event.nativeEvent.data);
         }}
@@ -67,37 +75,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   toolbar: {
-    minHeight: 54,
-    paddingHorizontal: 12,
+    height: 48,
+    paddingHorizontal: 8,
     borderBottomColor: '#E2E8F0',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
   },
   toolbarButton: {
-    minWidth: 64,
-    minHeight: 44,
+    width: 44,
+    height: 44,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  toolbarButtonText: {
-    color: '#2563EB',
-    fontSize: 16,
-    fontWeight: '700',
-  },
   disabled: {
-    opacity: 0.35,
+    opacity: 0.3,
   },
-  title: {
+  spacer: {
     flex: 1,
-    color: '#0F172A',
-    fontSize: 17,
-    fontWeight: '800',
-    textAlign: 'center',
   },
   webView: {
     flex: 1,
-    backgroundColor: '#EFF6FF',
   },
 });
