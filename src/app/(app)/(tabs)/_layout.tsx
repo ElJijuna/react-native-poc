@@ -1,6 +1,6 @@
 import { GlassView } from 'expo-glass-effect';
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet, Text, type ColorValue } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View, type ColorValue } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const icons = {
@@ -13,41 +13,76 @@ function TabIcon({ name, color }: { name: keyof typeof icons; color: ColorValue 
   return <Text style={[styles.icon, { color }]}>{icons[name]}</Text>;
 }
 
-export default function TabsLayout() {
+type PillTabBarProps = {
+  state: {
+    routes: { key: string; name: string }[];
+    index: number;
+  };
+  descriptors: Record<string, {
+    options: {
+      tabBarIcon?: (p: { focused: boolean; color: string; size: number }) => React.ReactNode;
+      title?: string;
+    };
+  }>;
+  navigation: {
+    emit: (e: { type: string; target: string; canPreventDefault: boolean }) => { defaultPrevented: boolean };
+    navigate: (name: string) => void;
+  };
+};
+
+function PillTabBar({ state, descriptors, navigation }: PillTabBarProps) {
   const insets = useSafeAreaInsets();
 
-  const iosTabBarStyle = {
-    position: 'absolute' as const,
-    left: 20,
-    right: 20,
-    bottom: insets.bottom + 8,
-    height: 56,
-    backgroundColor: 'transparent',
-    borderTopWidth: 0,
-    borderRadius: 28,
-    elevation: 0,
-    shadowOpacity: 0,
-  };
-
-  const androidTabBarStyle = {
-    height: 66,
-    paddingTop: 6,
-    paddingBottom: 8,
-    backgroundColor: '#FFFFFF',
-    borderTopColor: '#E2E8F0',
-  };
+  const visibleRoutes = state.routes.filter(
+    (route) => descriptors[route.key].options.tabBarIcon !== undefined,
+  );
 
   return (
+    <View style={[styles.pill, { bottom: insets.bottom + 8 }]}>
+      {Platform.OS === 'ios' ? (
+        <GlassView style={StyleSheet.absoluteFill} />
+      ) : (
+        <View style={[StyleSheet.absoluteFill, styles.pillAndroid]} />
+      )}
+
+      {visibleRoutes.map((route) => {
+        const { options } = descriptors[route.key];
+        const isFocused = state.routes[state.index]?.key === route.key;
+        const color = isFocused ? '#007AFF' : '#8E8E93';
+
+        return (
+          <Pressable
+            key={route.key}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isFocused }}
+            onPress={() => {
+              const event = navigation.emit({
+                type: 'tabPress',
+                target: route.key,
+                canPreventDefault: true,
+              });
+              if (!isFocused && !event.defaultPrevented) {
+                navigation.navigate(route.name);
+              }
+            }}
+            style={styles.tabItem}>
+            {options.tabBarIcon?.({ color, focused: isFocused, size: 22 })}
+            <Text style={[styles.tabLabel, { color }]}>
+              {options.title ?? route.name}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+export default function TabsLayout() {
+  return (
     <Tabs
+      tabBar={(props) => <PillTabBar {...(props as unknown as PillTabBarProps)} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: '#8E8E93',
-        tabBarLabelStyle: styles.label,
-        tabBarStyle: Platform.OS === 'ios' ? iosTabBarStyle : androidTabBarStyle,
-        tabBarBackground: Platform.OS === 'ios'
-          ? () => <GlassView style={[StyleSheet.absoluteFill, styles.tabBarGlass]} />
-          : undefined,
       }}>
       <Tabs.Screen
         name="index"
@@ -82,10 +117,26 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBarGlass: {
+  pill: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    height: 56,
     borderRadius: 28,
+    overflow: 'hidden',
+    flexDirection: 'row',
   },
-  label: {
+  pillAndroid: {
+    backgroundColor: 'rgba(255,255,255,0.97)',
+    elevation: 8,
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  tabLabel: {
     fontSize: 11,
     fontWeight: '600',
   },
