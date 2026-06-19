@@ -1,6 +1,7 @@
-import { SymbolView } from 'expo-symbols';
-import { router, Tabs } from 'expo-router';
-import { Pressable, StyleSheet, Text, type ColorValue } from 'react-native';
+import { GlassView } from 'expo-glass-effect';
+import { Tabs } from 'expo-router';
+import { Platform, StyleSheet, Text, type ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const icons = {
   index: '⌂',
@@ -13,14 +14,40 @@ function TabIcon({ name, color }: { name: keyof typeof icons; color: ColorValue 
 }
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
+  const iosTabBarStyle = {
+    position: 'absolute' as const,
+    left: 20,
+    right: 20,
+    bottom: insets.bottom + 8,
+    height: 56,
+    backgroundColor: 'transparent',
+    borderTopWidth: 0,
+    borderRadius: 28,
+    elevation: 0,
+    shadowOpacity: 0,
+  };
+
+  const androidTabBarStyle = {
+    height: 66,
+    paddingTop: 6,
+    paddingBottom: 8,
+    backgroundColor: '#FFFFFF',
+    borderTopColor: '#E2E8F0',
+  };
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#2563EB',
-        tabBarInactiveTintColor: '#64748B',
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: '#8E8E93',
         tabBarLabelStyle: styles.label,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: Platform.OS === 'ios' ? iosTabBarStyle : androidTabBarStyle,
+        tabBarBackground: Platform.OS === 'ios'
+          ? () => <GlassView style={[StyleSheet.absoluteFill, styles.tabBarGlass]} />
+          : undefined,
       }}>
       <Tabs.Screen
         name="index"
@@ -47,27 +74,7 @@ export default function TabsLayout() {
         name="native-webview"
         options={{
           href: null,
-          headerShown: true,
-          title: 'Portal',
-          headerShadowVisible: false,
-          headerStyle: { backgroundColor: '#FFFFFF' },
-          headerTintColor: '#2563EB',
-          headerTitleStyle: { color: '#0F172A', fontWeight: '700' },
-          headerLeft: () => (
-            <Pressable
-              accessibilityLabel="Volver al dashboard"
-              accessibilityRole="button"
-              hitSlop={8}
-              onPress={() => router.back()}
-              style={styles.headerBack}>
-              <SymbolView
-                name={{ ios: 'chevron.left', android: 'arrow_back' }}
-                size={20}
-                tintColor="#2563EB"
-              />
-              <Text style={styles.headerBackText}>Inicio</Text>
-            </Pressable>
-          ),
+          headerShown: false,
         }}
       />
     </Tabs>
@@ -75,32 +82,15 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
-    height: 66,
-    paddingTop: 6,
-    paddingBottom: 8,
-    borderTopColor: '#E2E8F0',
+  tabBarGlass: {
+    borderRadius: 28,
   },
   label: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
   },
   icon: {
     fontSize: 22,
     lineHeight: 24,
-  },
-  headerBack: {
-    minHeight: 44,
-    minWidth: 72,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    justifyContent: 'center',
-    paddingRight: 8,
-  },
-  headerBackText: {
-    color: '#2563EB',
-    fontSize: 17,
-    fontWeight: '500',
   },
 });
